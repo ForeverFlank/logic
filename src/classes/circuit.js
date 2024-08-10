@@ -1,5 +1,6 @@
 import { Module, WireNode, Input, Output } from "./module.js";
 import { evaluateAll } from "./evaluate.js";
+import { mainContainer } from "../main.js";
 
 class Circuit extends Module {
     constructor(obj) {
@@ -52,6 +53,7 @@ class Circuit extends Module {
     }
     removeModule(mod, evaluate = true) {
         mod.inputs.concat(mod.outputs).forEach((x) => x.disconnectAll());
+        mainContainer.removeChild(mod.container);
         this.modules = this.modules.filter((x) => x.id != mod.id);
         this.inputModules = this.inputModules.filter((x) => x.id != mod.id);
         this.outputModules = this.outputModules.filter((x) => x.id != mod.id);

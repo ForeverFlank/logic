@@ -12,14 +12,17 @@
 </head>
 
 <body">
-  <p class="fixed left-3 bottom-2 text-sm text-zinc-600">v1.13 alpha <a class="mx-2 underline"
+  <p class="fixed left-3 bottom-2 text-sm text-zinc-600">v2.01 alpha <a class="mx-2 underline"
       href="https://github.com/ForeverFlank/circuit-webapp" target="_blank">Source Code</a></p>
   <div id="top-tab" class="flex sticky top-0 h-14 z-20 bg-zinc-100 border-b border-zinc-200">
     <div>
       <button class="h-full left-3 mx-3 my-0 px-4 py-0 top-button" onclick="openAccordionMenu('menu-circuits', 'grid')">
         File
       </button>
-      <button class="h-full left-3 mx-3 my-0 px-4 py-0 top-button" onclick="openAccordionMenu('menu-learn', 'grid')">
+      <button class="h-full left-3 mx-3 my-0 px-4 py-0 top-button" onclick="closeTab('learn-container')">
+        Simulator
+      </button>
+      <button class="h-full left-3 mx-3 my-0 px-4 py-0 top-button" onclick="openTab('learn-container', 'block')">
         Learn
       </button>
       <div id="menu-circuits" class="top-accordion top-14 left-3 shadow z-20" style="display: none">
@@ -98,7 +101,7 @@
         <img id="gate-nbit-arrow" src="sprites/ui/expand-more.svg" class="ease-in-out duration-200">
       </button>
       <div id="gate-nbit" class="accordion-gate" style="display: none">
-        
+
       </div>
 
       <!--div id="module-button-container">
@@ -143,11 +146,9 @@
     <div id="selecting-input" class="flex flex-col gap-y-2" style="display: none">
       <p class="text-sm text-zinc-600">Value</p>
       <div class="flex flex-row justify-between">
-        <button id="selecting-input-z" class="flex-1 h-8 border border-zinc-200 rounded-l-md"
-          onclick="setInput(0, -1)">Z</button>
-        <button id="selecting-input-0" class="flex-1 h-8 border-y border-zinc-200" onclick="setInput(0, 0)">0</button>
-        <button id="selecting-input-1" class="flex-1 h-8 border border-zinc-200 rounded-r-md"
-          onclick="setInput(0, 1)">1</button>
+        <button id="selecting-input-z" class="flex-1 h-8 border border-zinc-200 rounded-l-md" onclick="">Z</button>
+        <button id="selecting-input-0" class="flex-1 h-8 border-y border-zinc-200" onclick="">0</button>
+        <button id="selecting-input-1" class="flex-1 h-8 border border-zinc-200 rounded-r-md" onclick="">1</button>
       </div>
     </div>
 
@@ -184,6 +185,66 @@
     </div-->
   </div>
 
+  <div id="learn-container" class="absolute p-12 top-14 left-0 overflow-scroll w-full h-full bg-zinc-100"
+    style="display: none;">
+
+    <div class="max-w-[36rem] mx-auto">
+      <div id="learn-menu-container" class="flex flex-col gap-y-3">
+        <template id="learn-menu-item">
+          <div class="p-4 bg-white rounded-lg border border-zinc-200">
+            <h2 class="font-bold">Test</h2>
+            <p class="text-sm">Descriptions</p>
+            <div class="pt-4">
+              <button class="px-3 h-8 rounded-md text-sm text-white bg-blue-500">Test</button>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <div id="learn-quiz-container" class="flex flex-col gap-y-3" style="display: none;">
+        <div class="hidden bg-zinc-300"></div>
+        <div class="hidden bg-yellow-400"></div>
+        <div class="hidden bg-green-500"></div>
+        <div class="hidden bg-red-500"></div>
+
+        <div id="learn-question-indicator"
+          class="align-middle grid grid-cols-[repeat(20,_minmax(0,_1fr))] gap-1 bg-white p-2 rounded-lg border border-zinc-200">
+        </div>
+        
+        <template id="learn-question-indicator-template">
+          <div class="block w-4 h-4 rounded bg-zinc-300"></div>
+        </template>
+
+        <form id="learn-question-container" class="flex flex-col gap-y-3">
+        </form>
+
+        <template id="learn-question-fieldset">
+          <fieldset class="p-4 bg-white rounded-lg border border-zinc-200 text-sm">
+            <div class="flex">
+              <p class="font-bold">Num.</p>
+              <p class="">Question?</p>
+            </div>
+            <img>
+          </fieldset>
+        </template>
+        <template id="learn-question-radio">
+          <label class="flex mt-2 gap-x-2">
+            <input type="radio"><span>Choice</span>
+          </label>
+        </template>
+
+        <div class="flex gap-x-2">
+          <button id="learn-quiz-submit"
+            class="px-3 h-8 max-w-24 rounded-md text-sm text-white bg-blue-500">Submit</button>
+          <button id="learn-quiz-back" class="px-3 h-8 max-w-24 rounded-md text-sm text-white bg-zinc-500">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="pt-8">&ensp;</p>
+
+  </div>
+
   <p id="fps-counter" class="fixed bottom-6 left-3">0</p>
 
   <!--script src="src/p5.min.js"></script>
@@ -211,9 +272,10 @@
   <script src="src/ui/selected-object.js"></script>
   <script src="src/input-handler.js"></script-->
   <script src="src/ui/accordion.js"></script>
-  
+
   <script type="module" src="src/main.js"></script>
   <script type="module" src="src/ui/ui.js"></script>
-</body>
+  <script type="module" src="src/quiz/quizzes-manager.js"></script>
+  </body>
 
 </html>

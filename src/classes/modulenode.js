@@ -308,11 +308,13 @@ class ModuleNode {
     }
     disconnect(node, evaluate = true) {
         let [incomingWire, outgoingWire] = this.getWire(node);
-
+        
+        mainContainer.removeChild(incomingWire.graphics);
+        mainContainer.removeChild(outgoingWire.graphics);
         node.connections = node.connections.filter((x) => x != incomingWire);
-
         this.connections = this.connections.filter((x) => x != outgoingWire);
 
+        
         if (
             node.connections.length == 0 &&
             node.isGenericNode() &&
@@ -369,11 +371,12 @@ class ModuleNode {
     render(obj) {
         if (this.owner.isHiddenOnAdd) return;
         if (this.graphics == null) {
-            this.graphics = new PIXI.Graphics()
+            this.graphics = new PIXI.Graphics();
             this.graphics.eventMode = "static";
             this.graphics.circle(0, 0, 4);
             this.graphics.fill(0xffffff);
-            mainContainer.addChild(this.graphics);
+            this.owner.container.addChild(this.graphics);
+            // mainContainer.addChild(this.graphics);
         }
         const netX = this.getCanvasX();
         const netY = this.getCanvasY();

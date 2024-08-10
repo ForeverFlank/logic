@@ -21,7 +21,6 @@ function closeMenu() {
 // var controlMode;
 
 import { Editor } from "../editor/editor.js";
-
 const controlModes = ["edit", "pan", "delete"];
 function setControlMode(mode) {
     Editor.mode = mode;

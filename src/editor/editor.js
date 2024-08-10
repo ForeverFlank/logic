@@ -10,7 +10,13 @@ class Editor {
 
     static mode = "edit";
     static wireDraggingEnabled = false;
-    static divIds = ["top-tab", "gate-menu", "selecting-circuit-object-container", "control-tab"];
+    static divIds = [
+        "top-tab",
+        "gate-menu",
+        "selecting-circuit-object-container",
+        "control-tab",
+        "learn-container"
+    ];
     static blurDiv = document.getElementById("background-blur");
 
     static container = null;
@@ -21,6 +27,7 @@ class Editor {
     static panEnabled = false;
 
     static pressedCircuitObject = { id: 0 };
+    static pressedWire = { id: 0 };
     static pressedNode = null;
     static wireDrawingGraphics = null;
 
@@ -47,7 +54,10 @@ class Editor {
                 break;
             }
         }
-        // updateSelectedCircuitObjectUI();
+        if (isPressedOnCircuit) {
+            Editor.selectedCircuitObject = Editor.pressedCircuitObject;
+        }
+        updateSelectedCircuitObjectUI();
         return isPressedOnCircuit;
     }
     static circuitPointerMove(e) {
@@ -80,7 +90,6 @@ class Editor {
         }
         if (!releasedOnNode) {
             if (Editor.pressedNode) {
-                console.log('asd')
                 Editor.pressedNode.addWireNode();
             }
         }
@@ -124,11 +133,17 @@ function editorPointerDown(e) {
             Editor.panEnabled = true;
         }
     } else if (Editor.mode == "pan") {
-
         Editor.panEnabled = true;
     } else if (Editor.mode == "delete") {
-
+        Editor.circuitPointerDown(e);
+        if (Editor.pressedCircuitObject.id != 0) {
+            Editor.pressedCircuitObject.remove();
+        }
+        if (Editor.pressedWire.id != 0) {
+            Editor.pressedWire.remove();
+        }
     }
+    updateSelectedCircuitObjectUI();
 }
 
 EventHandler.add("pointerdown", editorPointerDown);
@@ -184,6 +199,7 @@ EventHandler.add("pointerup",
 
 EventHandler.add("wheel",
     function viewportPanZoom(e) {
+        if (Editor.isPointerHoveringOnDiv(e)) return;
         const zoomFactor = 0.1;
         const zoomDirection = e.deltaY < 0 ? 1 : -1;
         const zoom = zoomFactor * zoomDirection * Editor.zoom;

@@ -155,11 +155,12 @@ class Module {
         });
     }
     remove() {
+        // console.log("rm")
+        mainContainer.removeChild(this.container);
         currentCircuit.removeModule(this);
     }
     render(
         obj = {
-            container: undefined,
             graphics: undefined,
             labels: [[this.displayName, 12, 0, 0]],
             src: undefined,
@@ -170,16 +171,27 @@ class Module {
         }
     ) {
         if (this.sprite == null) {
-            this.container = obj.container;
+            this.container = new PIXI.Container();
+            mainContainer.addChild(this.container);
+
             this.sprite = PIXI.Sprite.from('sprites/' + obj.src + '.png');
-            mainContainer.addChild(this.sprite)
             this.sprite.x = this.x;
             this.sprite.y = this.y;
             this.sprite.scale.x = Constants.TEXTURE_RESCALE;
             this.sprite.scale.y = Constants.TEXTURE_RESCALE;
-            console.log(this.x, this.y)
+            this.container.addChild(this.sprite)
+
+            // console.log(this.x, this.y)
             const colorMatrix = new PIXI.ColorMatrixFilter();
             this.sprite.filters = [colorMatrix];
+
+            this.labelTexts = [];
+            for (let i = 0, len = obj.labels.length; i < len; ++i) {
+                let item = obj.labels[i];
+                let text = new PIXI.Text({ text: item[0]})
+                this.labelTexts.push(text);
+                
+            }
         }
         if (this.isDragging) {
             this.sprite.filters[0].brightness(0.6);
@@ -334,11 +346,11 @@ class Module {
     released(e) {
         this.isHiddenOnAdd = false;
         if (this.ignoreDiv && Editor.isPointerHoveringOnDiv(e)) {
-            this.x = round(cameraCenterX / 20) * 20;
-            this.y = round(cameraCenterY / 20) * 20;
+            // this.x = round(cameraCenterX / 20) * 20;
+            // this.y = round(cameraCenterY / 20) * 20;
         }
         this.isDragging = false;
-        this.isHovering = false;
+        // this.isHovering = this.hovering(e);
         this.inputs.concat(this.outputs).forEach((x) => {
             x.connectByGrid();
         });
@@ -403,17 +415,17 @@ class WireNode extends Module {
     pressed(e) {
         if (this.hovering(e) && Editor.pressedCircuitObject.id == 0) {
             Editor.pressedCircuitObject = this;
-            if (mouseButton == LEFT) {
+            if (e.button == 0) {
                 return this;
             }
-            if (mouseButton == RIGHT) {
+            if (e.button == 2) {
                 this.remove();
             }
         }
         return false;
     }
     render() {
-        return;
+        super.render();
     }
     static add(x, y, value, evaluate) {
         console.log('we')
@@ -465,13 +477,6 @@ class Input extends Module {
     }
 }
 
-function setInput(time, value) {
-    value = State.fromNumber(value);
-    selectedObject.setInput([value], time);
-    setInputButtonColor(value);
-    currentCircuit.evaluateAll(false);
-}
-
 function setInputButtonColor(value) {
     function element(s) {
         return document.getElementById(`selecting-input-${s}`);
@@ -486,6 +491,20 @@ function setInputButtonColor(value) {
     element("0").style.color = value == State.low ? "white" : "black";
     element("1").style.color = value == State.high ? "white" : "black";
 }
+
+function setInput(time, value) {
+    value = State.fromNumber(value);
+    Editor.selectedCircuitObject.setInput([value], time);
+    setInputButtonColor(value);
+    currentCircuit.evaluateAll(false);
+}
+
+document.getElementById('selecting-input-z')
+        .addEventListener('click', () => setInput(0, -1));
+document.getElementById('selecting-input-0')
+        .addEventListener('click', () => setInput(0,  0));
+document.getElementById('selecting-input-1')
+        .addEventListener('click', () => setInput(0,  1));
 
 class Output extends Module {
     constructor(obj) {

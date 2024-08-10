@@ -2,18 +2,17 @@ import { Editor } from "../editor/editor.js";
 
 function updateSelectedCircuitObjectUI() {
     const div = document.getElementById("selecting-circuit-object-container");
-    console.log(div.children)
     for (let i = 0, len = div.children.length; i < len; ++i) {
         div.children[i].style.display = "none";
     }
-
-    if (Editor.selectedObject) {
-        let name = Editor.selectedObject.name;
+    // console.log(Editor.selectedCircuitObject)
+    if (Editor.selectedCircuitObject) {
+        let name = Editor.selectedCircuitObject.name;
         if (name != null) {
             div.style.display = "flex";
             document.getElementById("selecting-name").style.display = "flex";
             document.getElementById("selecting-name").innerText = name;
-            Editor.selectedObject.selected();
+            Editor.selectedCircuitObject.selected();
         } else {
             div.style.display = "none";
         }

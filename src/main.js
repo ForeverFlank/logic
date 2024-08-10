@@ -1,7 +1,7 @@
 import { preloadTextures } from "./init.js";
 import { CanvasContainer } from "./classes/canvas.js";
-import { EventHandler } from "./event/event-handler.js";
 import { Editor } from "./editor/editor.js";
+import { EventHandler } from "./event/event-handler.js";
 import { Circuit } from "./classes/circuit.js"
 import { createGateMenuButtons } from "./gate-menu-buttons.js";
 import { Input } from "./classes/module.js";
@@ -40,23 +40,25 @@ await app.init({
     height: mainCanvasContainer.getContainerHeight(),
     backgroundColor: canvasStyle.backgroundColor,
     antialias: true,
+    resizeTo: window
 });
 document.getElementById("canvas-container").appendChild(app.canvas);
 
 mainContainer.x = mainCanvasContainer.getContainerWidth() / 2;
 mainContainer.y = mainCanvasContainer.getContainerHeight() / 2;
 app.stage.addChild(mainContainer);
+
 Editor.container = mainContainer;
 Editor.position.x = mainContainer.x;
 Editor.position.y = mainContainer.y;
 Editor.wireDrawingGraphics = new PIXI.Graphics();
 Editor.wireDrawingGraphics.eventMode = "static";
-mainContainer.addChild(Editor.wireDrawingGraphics);
 
 await PIXI.Assets.load("./src/sample.png");
 let sprite = PIXI.Sprite.from("./src/sample.png");
 // mainContainer.addChild(sprite);
 mainContainer.addChild(gridGraphics);
+mainContainer.addChild(Editor.wireDrawingGraphics);
 
 const graphics = new PIXI.Graphics();
 graphics.eventMode = "static";
@@ -67,15 +69,15 @@ let i = 0;
 
 app.ticker.add((ticker) => {
     drawGrid();
-/*
-    graphics.clear();
-    graphics.star(0, 0, 4, 10);
-    graphics.fill(0x888888);
-    graphics.star(0, 20, 4, 10);
-    graphics.fill(0x00ff00);
-    graphics.star(20, 0, 4, 10);
-    graphics.fill(0xff0000);
-*/
+    /*
+        graphics.clear();
+        graphics.star(0, 0, 4, 10);
+        graphics.fill(0x888888);
+        graphics.star(0, 20, 4, 10);
+        graphics.fill(0x00ff00);
+        graphics.star(20, 0, 4, 10);
+        graphics.fill(0xff0000);
+    */
     for (let i = currentCircuit.modules.length - 1; i >= 0; --i) {
         let mod = currentCircuit.modules[i];
         mod.render({
@@ -101,6 +103,21 @@ app.ticker.add((ticker) => {
             renderWire(node);
             node.render();
         }
+    }
+    
+    const wireGraphics = Editor.wireDrawingGraphics;
+    wireGraphics.clear();
+    if (Editor.pressedCircuitObject.objectType == "node") {
+        wireGraphics.moveTo(
+            Editor.pressedCircuitObject.getCanvasX(),
+            Editor.pressedCircuitObject.getCanvasY());
+        wireGraphics.lineTo(
+            Editor.pointerPosition.x,
+            Editor.pointerPosition.y);
+        wireGraphics.stroke({
+            width: 2,
+            color: 0
+        });
     }
 
     elapsed += ticker.deltaTime;

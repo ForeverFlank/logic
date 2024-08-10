@@ -218,14 +218,15 @@ class Wire {
             return false;
         }
         if (this.isHovering) {
-            pressedWire = this;
-            if (mouseButton == RIGHT) {
+            Editor.pressedWire = this;
+            if (e.button == 2) {
                 return this.remove();
             }
         }
         return false;
     }
     remove() {
+        mainContainer.removeChild(this.graphics);
         this.source.disconnect(this.destination);
         let otherWire = this.destination.connections.find(
             (x) => x.destination.id == this.id
