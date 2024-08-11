@@ -33,7 +33,7 @@ let buttons = {
     "gate-arithmetic": [
         ["Half Adder", () => Gates.Basic.HalfAdder.add()],
         ["Full Adder", () => Gates.Basic.FullAdder.add()],
-        ["N-bit Adder", () => Gates.Basic.NBitAdder.add()],
+        ["N-bit Adder", () => Gates.NBit.NBitAdder.add()],
     ],
     "gate-nbit": [
         ["N-bit Input", () => Gates.NBit.NBitInput.add()],
