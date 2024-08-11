@@ -224,6 +224,7 @@ EventHandler.add("pointerup", editorPointerUp);
 
 EventHandler.add("wheel",
     function viewportPanZoom(e) {
+        updateEditorPointerPosition(e);
         if (Editor.isPointerHoveringOnDiv(e)) return;
         const zoomFactor = 0.1;
         const zoomDirection = e.deltaY < 0 ? 1 : -1;
@@ -239,7 +240,7 @@ EventHandler.add("wheel",
         if (Editor.zoom < 0.2) Editor.zoom = 0.2;
         else if (Editor.zoom > 5) Editor.zoom = 5;
         else {
-            Editor.position.x = EventHandler.pointerPosition - dx;
+            Editor.position.x = EventHandler.pointerPosition.x - dx;
             Editor.position.y = EventHandler.pointerPosition.y - dy;
         }
         Editor.updateViewport();
