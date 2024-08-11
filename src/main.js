@@ -36,7 +36,7 @@ const mainContainer = new PIXI.Container({
 export { mainContainer };
 
 PIXI.Assets.addBundle("fonts", [
-    { alias: "Inter", src: "Inter-Bold.ttf" }
+    { alias: "Inter", src: "./Inter-Bold.ttf" }
 ]);
 
 await app.init({
@@ -47,6 +47,15 @@ await app.init({
     resizeTo: window
 });
 document.getElementById("canvas-container").appendChild(app.canvas);
+document.getElementById("canvas-container")
+    .children[0]
+    .addEventListener("contextmenu", e => {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+document.getElementById("canvas-container")
+    .children[0]
+    .setAttribute("oncontextmenu", "return false;");
 
 mainContainer.x = mainCanvasContainer.getContainerWidth() / 2;
 mainContainer.y = mainCanvasContainer.getContainerHeight() / 2;
@@ -108,7 +117,7 @@ app.ticker.add((ticker) => {
             node.render();
         }
     }
-    
+
     const wireGraphics = Editor.wireDrawingGraphics;
     wireGraphics.clear();
     if (Editor.pressedCircuitObject.objectType == "node") {

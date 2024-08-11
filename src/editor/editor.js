@@ -80,6 +80,7 @@ class Editor {
             let mod = currentCircuit.modules[i];
             let nodes = mod.inputs.concat(mod.outputs);
             mod.released(e);
+            mod.isHovering = false;
             for (let j = nodes.length - 1; j >= 0; j--) {
                 releasedOnNode |= nodes[j].released(e, false)
                 let wires = nodes[j].connections;
@@ -94,6 +95,7 @@ class Editor {
             }
         }
         Editor.pressedCircuitObject = { id: 0 };
+        Editor.pressedWire = { id: 0 };
         Editor.pressedNode = null;
     }
     static isPointerHoveringOnDiv(e) {
@@ -123,9 +125,11 @@ class Editor {
         Editor.container.scale.y = Editor.zoom;
     }
 }
+
 function editorPointerDown(e) {
     // console.log(e)
     // console.log(Editor.mode)
+    // console.log('down', e.x, e.y)
     if (Editor.mode == "edit") {
         if (Editor.isPointerHoveringOnDiv(e)) return;
         let isPressedOnCircuit = Editor.circuitPointerDown(e);
@@ -149,10 +153,10 @@ function editorPointerDown(e) {
 }
 
 EventHandler.add("pointerdown", editorPointerDown);
-EventHandler.add("touchstart", editorPointerDown);
+// EventHandler.add("touchstart", editorPointerDown);
 
 function editorPointerMove(e) {
-    // console.log(e)
+    // console.log('move', e.x, e.y)
 
     const width = document.body.clientWidth;
     const height = document.body.clientHeight;
@@ -189,15 +193,25 @@ function editorPointerMove(e) {
 
 }
 
-EventHandler.add("pointermove", editorPointerMove);
-// EventHandler.add("touchdrag", editorPointerMove);
+let touched = false;
+EventHandler.add("touchdrag", (e) => {
+    editorPointerMove(e);
+    touched = true;
+    // console.log("TOUCH")
+});
+EventHandler.add("pointermove", (e) => {
+    // console.log(touched)
+    editorPointerMove(e)
+});
 
-EventHandler.add("pointerup",
-    function editorPointerUp(e) {
-        Editor.circuitPointerUp(e);
-        Editor.panEnabled = false;
-    }
-);
+function editorPointerUp(e) {
+    // console.log("up", e.x, e.y);
+    Editor.circuitPointerUp(e);
+    Editor.panEnabled = false;
+}
+
+EventHandler.add("pointerup", editorPointerUp);
+// EventHandler.add("touchend", editorPointerUp);
 
 EventHandler.add("wheel",
     function viewportPanZoom(e) {

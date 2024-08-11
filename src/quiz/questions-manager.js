@@ -22,7 +22,7 @@ async function loadQuestions(obj) {
         newDiv.children[0].children[0].innerHTML = (i + 1) + ".&ensp;"
         newDiv.children[0].children[1].innerText = question.question;
         if (question.src) {
-            newDiv.children[1].setAttribute("src", "/quizzes/" + obj.id + "/" + question.src);
+            newDiv.children[1].setAttribute("src", "./quizzes/" + obj.id + "/" + question.src);
         }
         // newDiv.children[1] = ...
         for (let j = 0, len = question.answers.length; j < len; ++j) {
