@@ -1,4 +1,4 @@
-import { EventHandler } from "../event/event-handler.js";
+import { EventHandler, updatePointerPosition } from "../event/event-handler.js";
 import * as Constants from "../constants.js"
 import { CanvasContainer } from "../classes/canvas.js";
 import { currentCircuit, mainCanvasContainer, mainContainer } from "../main.js";
@@ -107,10 +107,10 @@ class Editor {
             const height = div.clientHeight;
             const width = div.clientWidth;
             if (
-                e.y > top &&
-                e.y < top + height &&
-                e.x > left &&
-                e.x < left + width
+                EventHandler.pointerPosition.y > top &&
+                EventHandler.pointerPosition.y < top + height &&
+                EventHandler.pointerPosition.x > left &&
+                EventHandler.pointerPosition.x < left + width
             ) {
                 return true;
             }
@@ -126,10 +126,21 @@ class Editor {
     }
 }
 
+function updateEditorPointerPosition(e) {
+    updatePointerPosition(e);
+    const width = document.body.clientWidth;
+    const height = document.body.clientHeight;
+    Editor.pointerPosition.x = (EventHandler.pointerPosition.x - Editor.position.x) / Editor.zoom;
+    Editor.pointerPosition.y = (EventHandler.pointerPosition.y - Editor.position.y) / Editor.zoom;
+    Editor.centerPosition.x = (width / 2 - Editor.position.x) / Editor.zoom;
+    Editor.centerPosition.y = (height / 2 - Editor.position.y) / Editor.zoom;
+}
+
 function editorPointerDown(e) {
     // console.log(e)
     // console.log(Editor.mode)
-    // console.log('down', e.x, e.y)
+    updateEditorPointerPosition(e);
+    console.log('down', EventHandler.pointerPosition.x, EventHandler.pointerPosition.y)
     if (Editor.mode == "edit") {
         if (Editor.isPointerHoveringOnDiv(e)) return;
         let isPressedOnCircuit = Editor.circuitPointerDown(e);
@@ -156,14 +167,9 @@ EventHandler.add("pointerdown", editorPointerDown);
 // EventHandler.add("touchstart", editorPointerDown);
 
 function editorPointerMove(e) {
-    // console.log('move', e.x, e.y)
+    // console.log('move', EventHandler.pointerPosition.x, EventHandler.pointerPosition.y)
 
-    const width = document.body.clientWidth;
-    const height = document.body.clientHeight;
-    Editor.pointerPosition.x = (EventHandler.pointerPosition.x - Editor.position.x) / Editor.zoom;
-    Editor.pointerPosition.y = (EventHandler.pointerPosition.y - Editor.position.y) / Editor.zoom;
-    Editor.centerPosition.x = (width / 2 - Editor.position.x) / Editor.zoom;
-    Editor.centerPosition.y = (height / 2 - Editor.position.y) / Editor.zoom;
+    updateEditorPointerPosition(e);
     /*
     placeX = -controls.view.x / controls.view.zoom;
     placeY = -controls.view.y / controls.view.zoom;
@@ -194,18 +200,21 @@ function editorPointerMove(e) {
 }
 
 let touched = false;
+/*
 EventHandler.add("touchdrag", (e) => {
     editorPointerMove(e);
     touched = true;
     // console.log("TOUCH")
 });
+*/
 EventHandler.add("pointermove", (e) => {
     // console.log(touched)
     editorPointerMove(e)
 });
 
 function editorPointerUp(e) {
-    // console.log("up", e.x, e.y);
+    // console.log("up", EventHandler.pointerPosition.x, EventHandler.pointerPosition.y);
+    updateEditorPointerPosition(e);
     Editor.circuitPointerUp(e);
     Editor.panEnabled = false;
 }
@@ -222,16 +231,16 @@ EventHandler.add("wheel",
         const zoomAmount = 1 + zoom / Editor.zoom;
         const width = mainCanvasContainer.getContainerWidth();
         const height = mainCanvasContainer.getContainerHeight();
-        let dx = e.x - Editor.position.x;
-        let dy = e.y - Editor.position.y;
+        let dx = EventHandler.pointerPosition.x - Editor.position.x;
+        let dy = EventHandler.pointerPosition.y - Editor.position.y;
         dx *= zoomAmount;
         dy *= zoomAmount;
         Editor.zoom += zoom;
         if (Editor.zoom < 0.2) Editor.zoom = 0.2;
         else if (Editor.zoom > 5) Editor.zoom = 5;
         else {
-            Editor.position.x = e.x - dx;
-            Editor.position.y = e.y - dy;
+            Editor.position.x = EventHandler.pointerPosition - dx;
+            Editor.position.y = EventHandler.pointerPosition.y - dy;
         }
         Editor.updateViewport();
     }

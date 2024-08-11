@@ -75,8 +75,10 @@ function updatePointerPosition(e) {
     EventHandler.previousPointerPosition.y = EventHandler.pointerPosition.y;
 }
 
-EventHandler.add("pointermove", updatePointerPosition)
-EventHandler.add("touchmove", updatePointerPosition)
+// EventHandler.add("pointerdown", updatePointerPosition);
+// EventHandler.add("pointermove", updatePointerPosition);
+// EventHandler.add("pointerup", updatePointerPosition);
+// EventHandler.add("touchmove", updatePointerPosition)
 
 EventHandler.addLate("pointerup",
     function latePointerUp(e) {
@@ -84,4 +86,4 @@ EventHandler.addLate("pointerup",
     }
 )
 
-export { EventHandler };
+export { EventHandler, updatePointerPosition };

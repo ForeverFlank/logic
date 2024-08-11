@@ -47,15 +47,6 @@ await app.init({
     resizeTo: window
 });
 document.getElementById("canvas-container").appendChild(app.canvas);
-document.getElementById("canvas-container")
-    .children[0]
-    .addEventListener("contextmenu", e => {
-        e.preventDefault();
-        e.stopPropagation();
-    });
-document.getElementById("canvas-container")
-    .children[0]
-    .setAttribute("oncontextmenu", "return false;");
 
 mainContainer.x = mainCanvasContainer.getContainerWidth() / 2;
 mainContainer.y = mainCanvasContainer.getContainerHeight() / 2;
