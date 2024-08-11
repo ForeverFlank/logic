@@ -50,8 +50,9 @@ class Wire {
 
         const ab = sub(a, b);
         const bc = sub(b, c);
-
-        return Math.abs(Math.sin(angle(ab, bc))) * mag(bc) <= radius / 2;
+        let isHovering = Math.abs(Math.sin(angle(ab, bc))) * mag(bc) <= radius / 2;
+        this.isHovering = isHovering;
+        return isHovering;
     }
     setDirection(from, to) {
         if (this.isSplitterConnection()) return;
@@ -69,47 +70,48 @@ class Wire {
             return false;
         return true;
     }
-    renderWire() {
+    renderCurrent() {
         const sourceX = this.source.getCanvasX();
         const sourceY = this.source.getCanvasY();
         const destinationX = this.destination.getCanvasX();
         const destinationY = this.destination.getCanvasY();
-        // console.log(sourceX, sourceY, destinationX, destinationY)
-        this.graphics.moveTo(sourceX, sourceY);
-        this.graphics.lineTo(destinationX, destinationY);
-        this.graphics.stroke({
-            color: 0xffffff,
-            width: 4
-        });
-
         const wireLength = Math.sqrt(
             (sourceX - destinationX) ** 2 + (sourceY - destinationY) ** 2
         )
-        const dotsCount = Math.floor(wireLength / Constants.GRID_SIZE);
         let isNBit =
-            this.source.getValueAtTime(Infinity).length > 1 ||
-            this.destination.getValueAtTime(Infinity).length > 1;
-
+        this.source.getValueAtTime(Infinity).length > 1 ||
+        this.destination.getValueAtTime(Infinity).length > 1;
+        
         if (this.dots) {
             for (let i = 0, len = this.dots.length; i < len; ++i) {
                 this.container.removeChild(this.dots[i]);
             }
         }
+        let dotsCount = Math.floor(wireLength / Constants.GRID_SIZE);
+        if (isNBit) dotsCount = Math.round(dotsCount / 3);
+
         this.dots = [];
         for (let i = 0; i < dotsCount; ++i) {
             const dot = new PIXI.Container();
             if (isNBit) {
+                let value = this.source.getValueAtTime(Infinity);
                 let style = new PIXI.TextStyle({
                     fontSize: 10,
                     fontFamily: "Inter"
                 });
                 let text = new PIXI.Text({
+                    text: State.toString(value),
                     resolution: 4,
                     style
                 });
-                text.offsetX = item[2];
-                text.offsetY = item[3];
                 text.anchor.set(0.5, 0.5);
+                let textWidth = text.width;
+                let textHeight = text.height;
+                textHeight *= 0.6;
+                let box = new PIXI.Graphics();
+                box.rect(-textWidth / 2, -textHeight / 2, textWidth, textHeight);
+                box.fill(0xf4f4f5);
+                dot.addChild(box);
                 dot.addChild(text);
             } else {
                 const circle = new PIXI.Graphics();
@@ -121,8 +123,25 @@ class Wire {
             this.container.addChild(dot);
         }
     }
+    renderWire() {
+        const sourceX = this.source.getCanvasX();
+        const sourceY = this.source.getCanvasY();
+        const destinationX = this.destination.getCanvasX();
+        const destinationY = this.destination.getCanvasY();
+        // console.log(sourceX, sourceY, destinationX, destinationY)
+        this.graphics.moveTo(sourceX, sourceY);
+        this.graphics.lineTo(destinationX, destinationY);
+        let strokeWidth = this.isHovering ? 6 : 4;
+        this.graphics.stroke({
+            color: 0xffffff,
+            width: strokeWidth
+        });
+    }
     render(obj = {}) {
-        if (!this.rendered) return;
+        if (!this.rendered && this.container) {
+            this.container.visible = false;
+            return;
+        }
         if (this.isSubModuleWire && !DEBUG_2) return;
         if (this.container == null) {
             this.container = new PIXI.Container();
@@ -130,12 +149,18 @@ class Wire {
             this.graphics.eventMode = "static";
             this.container.addChild(this.graphics);
             this.renderWire();
+            this.renderCurrent();
             mainContainer.addChild(this.container);
         }
+        this.container.visible = true;
+        
         if (obj.rerender) {
-            this.graphics.clear();
-            this.renderWire();
+            // this.graphics.clear();
+            // this.renderWire();
+            this.renderCurrent();
         }
+        this.graphics.clear();
+        this.renderWire();
 
         let color;
         if (this.source.getValueAtTime(Infinity).length == 1) {
@@ -153,48 +178,60 @@ class Wire {
         }
         this.graphics.tint = color;
 
-        const sourceX = this.source.getCanvasX();
-        const sourceY = this.source.getCanvasY();
-        const destinationX = this.destination.getCanvasX();
-        const destinationY = this.destination.getCanvasY();
-        const wireLength = Math.sqrt(
-            (sourceX - destinationX) ** 2 + (sourceY - destinationY) ** 2
-        );
+        let isStateHigh =
+            this.source.getValueAtTime(Infinity) == State.high ||
+            this.destination.getValueAtTime(Infinity) == State.high;
+        let isNBit =
+            this.source.getValueAtTime(Infinity).length > 1 ||
+            this.destination.getValueAtTime(Infinity).length > 1;
         const dotsCount = this.dots.length;
-        const speed = 100;
-        let value = this.source.getValueAtTime(Infinity);
-
-        for (let i = 0; i < dotsCount; ++i) {
-            let t =
-                ((speed * Date.now()) / (wireLength * 1000) + i / dotsCount) % 1;
-            let deltaX = destinationX - sourceX;
-            let deltaY = destinationY - sourceY;
-            if (value.length == 1) {
-                // circle(sourceX + deltaX * t, sourceY + deltaY * t, 4);
+        if (isStateHigh || isNBit) {
+            const sourceX = this.source.getCanvasX();
+            const sourceY = this.source.getCanvasY();
+            const destinationX = this.destination.getCanvasX();
+            const destinationY = this.destination.getCanvasY();
+            const wireLength = Math.sqrt(
+                (sourceX - destinationX) ** 2 + (sourceY - destinationY) ** 2
+            );
+            const speed = isNBit ? 60 : 120;
+            let value = this.source.getValueAtTime(Infinity);
+            for (let i = 0, j = 0; i < dotsCount; ++i, ++j) {
+                let t =
+                    ((speed * Date.now()) / (wireLength * 1000) + i / dotsCount) % 1;
+                let deltaX = destinationX - sourceX;
+                let deltaY = destinationY - sourceY;
                 this.dots[i].x = sourceX + deltaX * t;
                 this.dots[i].y = sourceY + deltaY * t;
-                // console.log(this.dots[i].x, this.dots[i].y)
-            } else {
-                // push();
-                let str = State.toString(value);
-                let bbox = fontRegular.textBounds(
-                    str,
-                    sourceX + deltaX * t,
-                    sourceY + deltaY * t - 16
-                );
-                fill("#f4f4f5");
-                rect(
-                    bbox.x - 2,
-                    bbox.y + 12,
-                    bbox.w + 2 * 2,
-                    bbox.h + 2 * 2
-                );
-                fill(0);
-                text(str, sourceX + deltaX * t, sourceY + deltaY * t - 1);
-                // pop();
+                /*
+                if (value.length == 1) {
+                    // circle(sourceX + deltaX * t, sourceY + deltaY * t, 4);
+                    // console.log(this.dots[i].x, this.dots[i].y)
+                } else {
+                    // push();
+                    let str = State.toString(value);
+                    let bbox = fontRegular.textBounds(
+                        str,
+                        sourceX + deltaX * t,
+                        sourceY + deltaY * t - 16
+                    );
+                    fill("#f4f4f5");
+                    rect(
+                        bbox.x - 2,
+                        bbox.y + 12,
+                        bbox.w + 2 * 2,
+                        bbox.h + 2 * 2
+                    );
+                    fill(0);
+                    text(str, sourceX + deltaX * t, sourceY + deltaY * t - 1);
+                    // pop();
+                }
+                    */
+            }
+        } else {
+            for (let i = 0; i < dotsCount; ++i) {
+                this.dots[i].visible = false;
             }
         }
-
         /*
         let sourceX = this.source.getCanvasX();
         let sourceY = this.source.getCanvasY();

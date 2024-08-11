@@ -308,13 +308,13 @@ class ModuleNode {
     }
     disconnect(node, evaluate = true) {
         let [incomingWire, outgoingWire] = this.getWire(node);
-        
+
         mainContainer.removeChild(incomingWire.container);
         mainContainer.removeChild(outgoingWire.container);
         node.connections = node.connections.filter((x) => x != incomingWire);
         this.connections = this.connections.filter((x) => x != outgoingWire);
 
-        
+
         if (
             node.connections.length == 0 &&
             node.isGenericNode() &&
@@ -362,37 +362,78 @@ class ModuleNode {
         if (Editor.mode == "pan") return false;
         if (Editor.isPointerHoveringOnDiv(e)) return false;
         let result =
-        (Editor.pointerPosition.x - this.getCanvasX()) ** 2 +
-        (Editor.pointerPosition.y - this.getCanvasY()) ** 2 <=
-        Constants.NODE_HOVERING_RADIUS ** 2;
+            (Editor.pointerPosition.x - this.getCanvasX()) ** 2 +
+            (Editor.pointerPosition.y - this.getCanvasY()) ** 2 <=
+            Constants.NODE_HOVERING_RADIUS ** 2;
         this.isHovering = result;
         return result;
     }
     render(obj) {
         if (this.owner.isHiddenOnAdd) return;
-        if (this.graphics == null) {
+        if (this.container == null) {
+            this.container = new PIXI.Container();
+            this.container.x = this.relativeX * Constants.GRID_SIZE;
+            this.container.y = this.relativeY * Constants.GRID_SIZE;
+
             this.graphics = new PIXI.Graphics();
             this.graphics.eventMode = "static";
             this.graphics.circle(0, 0, 4);
             this.graphics.fill(0xffffff);
-            this.owner.container.addChild(this.graphics);
+
+            this.pinGraphics = new PIXI.Graphics();
+            this.pinGraphics.eventMode = "static";
+            this.pinGraphics.moveTo(0, 0);
+            if (this.pinDirection == 0) this.pinGraphics.lineTo(10, 0);
+            if (this.pinDirection == 1) this.pinGraphics.lineTo(0, -10);
+            if (this.pinDirection == 2) this.pinGraphics.lineTo(-10, 0);
+            if (this.pinDirection == 3) this.pinGraphics.lineTo(0, 10);
+            this.pinGraphics.stroke({ width: 2, color: 0x000000 });
+
+            this.container.addChild(this.pinGraphics);
+            this.container.addChild(this.graphics);
+            this.owner.container.addChild(this.container);
             // mainContainer.addChild(this.graphics);
+        }
+
+        if (this.tooltipContainer == null) {
+            this.tooltipContainer = new PIXI.Container();
+            let style = new PIXI.TextStyle({
+                fontSize: 10,
+                fontFamily: "Inter",
+            });
+            let text = new PIXI.Text({
+                text: this.name,
+                resolution: 4,
+                style
+            });
+            text.y = -10;
+            text.anchor.set(0.5, 0.5);
+            let textWidth = text.width + 4;
+            let textHeight = text.height * 0.9;
+            let box = new PIXI.Graphics();
+            box.rect(-textWidth / 2, -textHeight / 2, textWidth, textHeight);
+            box.fill(0xfffee3);
+            box.y = -10;
+            this.tooltipContainer.addChild(box);
+            this.tooltipContainer.addChild(text);
+            this.container.addChild(this.tooltipContainer);
         }
         // const netX = this.getCanvasX();
         // const netY = this.getCanvasY();
         // this.graphics.x = netX;
         // this.graphics.y = netY;
-        this.graphics.x = this.relativeX * Constants.GRID_SIZE;
-        this.graphics.y = this.relativeY * Constants.GRID_SIZE;
+
         if (this.isDragging) {
             this.graphics.scale.x = 1.2;
             this.graphics.scale.y = 1.2;
         } else if (this.isHovering) {
             this.graphics.scale.x = 1.2;
             this.graphics.scale.y = 1.2;
+            this.tooltipContainer.visible = true;
         } else {
             this.graphics.scale.x = 1;
             this.graphics.scale.y = 1;
+            this.tooltipContainer.visible = false;
         }
         const value =
             this.valueAtTime[Math.max(...Object.keys(this.valueAtTime))];

@@ -1,3 +1,10 @@
+import { Module, WireNode } from "../classes/module.js";
+import { ModuleNode, InputNode, OutputNode, SplitterNode } from "../classes/modulenode.js";
+import { State } from "../classes/state.js";
+import { Editor } from "../editor/editor.js";
+import { currentCircuit, mainContainer } from "../main.js";
+import * as Constants from "../constants.js";
+
 class Splitter extends Module {
     constructor(name, splitArray = [[0], [1]]) {
         function splitArrayLength(array) {
@@ -6,8 +13,11 @@ class Splitter extends Module {
                 .reduce((sum, a) => sum + a, 0);
         }
         let width = splitArrayLength(splitArray);
-
-        super(name, 1, width);
+        let obj = {}
+        obj.name = name;
+        obj.width = 1;
+        obj.height = width;
+        super(obj);
         this.outputs = [];
         this.splitArray = splitArray;
         this.displayName = "";
@@ -72,6 +82,23 @@ class Splitter extends Module {
         super.evaluate(time);
     }
     render(graphics) {
+        if (this.container == null) {
+            this.container = new PIXI.Container();
+            this.container.x = this.x;
+            this.container.y = this.y;
+
+            this.sprite = new PIXI.Graphics();
+            this.sprite.moveTo(Constants.GRID_SIZE / 2, 0);
+            this.sprite.lineTo(
+                Constants.GRID_SIZE / 2,
+                (this.splitArray.length - 1) * 20
+            );
+            this.sprite.stroke({ width: 4, color: 0x000000 });
+
+            this.container.addChild(this.sprite);
+            mainContainer.addChild(this.container);
+        }
+        /*
         push();
         noFill();
         stroke(0);
@@ -84,6 +111,7 @@ class Splitter extends Module {
             this.y + this.splitArray.length * 20 - 20
         );
         pop();
+        */
         // super.render(graphics, );
     }
     released() {
@@ -107,6 +135,8 @@ function openSplitterMenu() {
         <button id="modal-submit" class="bg-blue-500 w-20 h-8 text-sm text-white rounded" onclick="addSplitter()">OK</button>
     </div>`;
     openModalMenu("Add Splitter", html);
+    document.getElementById("modal-submit")
+            .addEventListener("click", () => addSplitter());
 }
 
 function splitStringToSplitArray(string) {
@@ -148,8 +178,10 @@ function addSplitter() {
 }
 
 class NBitInput extends Module {
-    constructor(name) {
-        super(name, 2, 2);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 2;
+        if (obj.height == null) obj.height = 2;
+        super(obj);
         this.outputValue = [State.low];
         this.outputs = [
             new OutputNode(this, "Output", 2, 1, this.outputValue, 0),
@@ -163,14 +195,11 @@ class NBitInput extends Module {
     evaluate(time) {
         super.evaluate(time);
     }
-    render(graphics) {
-        super.render(graphics, 
-            [[State.toString(this.outputValue), 12, 0, 0]],
-            "basic/input"
-        );
-    }
-    released() {
-        super.released();
+    render(obj) {
+        obj.labels = [[State.toString(this.outputValue), 12, 0, 0]];
+        obj.src = "basic/input"
+        super.render(obj);
+        this.labelTexts[0].text = State.toString(this.outputValue);
     }
     selected() {
         super.selected();
@@ -178,16 +207,18 @@ class NBitInput extends Module {
         setNBitInputValue(this.outputValue);
     }
     static add() {
-        Module.addToCircuit(new NBitInput("N-bit Input"));
+        Module.addToCircuit(new NBitInput({ name: "N-bit Input" }));
     }
 }
 
 function setNBitInput(time) {
     let value = document.getElementById("selecting-nbitinput-value").value;
     value = State.fromString(value);
-    selectedObject.setInput(value, time);
+    Editor.selectedCircuitObject.setInput(value, time);
     currentCircuit.evaluateAll(false);
 }
+document.getElementById("selecting-nbitinput-value")
+        .addEventListener("input", () => setNBitInput(0))
 
 function setNBitInputValue(value) {
     document.getElementById("selecting-nbitinput-value").value =
@@ -195,16 +226,19 @@ function setNBitInputValue(value) {
 }
 
 class BitwiseNotGate extends Module {
-    constructor(name) {
-        super(name, 3, 2);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 3;
+        if (obj.height == null) obj.height = 2;
+        super(obj);
         this.inputs = [new InputNode(this, "Input", 0, 1)];
         this.outputs = [new OutputNode(this, "Output", 3, 1)];
         this.inputs.forEach((node) => (node.pinDirection = 0));
         this.outputs.forEach((node) => (node.pinDirection = 2));
         this.displayName = "NOT";
     }
-    render(graphics) {
-        super.render(graphics, );
+    render(obj) {
+        obj.labels = [[this.displayName, 10, 0, 0]];
+        super.render(obj);
         // super.render(graphics, this.displayName, 8, -8, 0, "basic/not");
     }
     evaluate(time) {
@@ -220,13 +254,15 @@ class BitwiseNotGate extends Module {
         );
     }
     static add() {
-        Module.addToCircuit(new BitwiseNotGate("Bitwise NOT Gate"));
+        Module.addToCircuit(new BitwiseNotGate({ name: "Bitwise NOT Gate" }));
     }
 }
 
 class NBitTriStateBuffer extends Module {
-    constructor(name) {
-        super(name, 4, 2);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 2;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Input", 0, 1),
             new InputNode(this, "Control", 2, 0),
@@ -234,8 +270,13 @@ class NBitTriStateBuffer extends Module {
         this.outputs = [new OutputNode(this, "Output", 4, 1)];
         this.displayName = "";
     }
-    render(graphics) {
-        super.render(graphics, [["", 12, -8, 0]], "basic/tristatebuffer");
+    render(obj = {
+        container: undefined,
+        graphics: undefined
+    }) {
+        obj.labels = [];
+        obj.src = "basic/tristatebuffer";
+        super.render(obj);
     }
     evaluate(time) {
         // console.warn("EVAL", time);
@@ -275,13 +316,15 @@ class NBitTriStateBuffer extends Module {
         super.evaluate(time + this.outputs[0].delay);
     }
     static add() {
-        Module.addToCircuit(new NBitTriStateBuffer("N-bit Tri-State Buffer"));
+        Module.addToCircuit(new NBitTriStateBuffer({ name: "N-bit Tri-State Buffer" }));
     }
 }
 
 class BitwiseAndGate extends Module {
-    constructor(name) {
-        super(name, 4, 4);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 4;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Input 1", 0, 1),
             new InputNode(this, "Input 2", 0, 3),
@@ -291,8 +334,9 @@ class BitwiseAndGate extends Module {
         this.outputs.forEach((node) => (node.pinDirection = 2));
         this.displayName = "AND";
     }
-    render(graphics) {
-        super.render(graphics, );
+    render(obj) {
+        obj.labels = [[this.displayName, 10, 0, 0]];
+        super.render(obj);
     }
     evaluate(time) {
         super.evaluate(time);
@@ -316,13 +360,15 @@ class BitwiseAndGate extends Module {
         }
     }
     static add() {
-        Module.addToCircuit(new BitwiseAndGate("Bitwise AND Gate"));
+        Module.addToCircuit(new BitwiseAndGate({ name: "Bitwise AND Gate" }));
     }
 }
 
 class BitwiseOrGate extends Module {
-    constructor(name) {
-        super(name, 4, 4);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 4;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Input 1", 0, 1),
             new InputNode(this, "Input 2", 0, 3),
@@ -332,8 +378,9 @@ class BitwiseOrGate extends Module {
         this.outputs.forEach((node) => (node.pinDirection = 2));
         this.displayName = "OR";
     }
-    render(graphics) {
-        super.render(graphics, );
+    render(obj) {
+        obj.labels = [[this.displayName, 10, 0, 0]];
+        super.render(obj);
     }
     evaluate(time) {
         super.evaluate(time);
@@ -357,13 +404,15 @@ class BitwiseOrGate extends Module {
         }
     }
     static add() {
-        Module.addToCircuit(new BitwiseOrGate("Bitwise OR Gate"));
+        Module.addToCircuit(new BitwiseOrGate({ name: "Bitwise OR Gate" }));
     }
 }
 
 class NBitMultiplexer extends Module {
-    constructor(name) {
-        super(name, 2, 3);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 2;
+        if (obj.height == null) obj.height = 3;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Input 1", 0, 1),
             new InputNode(this, "Input 2", 0, 2),
@@ -375,8 +424,9 @@ class NBitMultiplexer extends Module {
         this.outputs.forEach((node) => (node.pinDirection = 2));
         this.displayName = "";
     }
-    render(graphics) {
-        super.render(graphics, );
+    render(obj) {
+        obj.labels = [[this.displayName, 10, 0, 0]];
+        super.render(obj);
     }
     evaluate(time) {
         super.evaluate(time);
@@ -401,13 +451,15 @@ class NBitMultiplexer extends Module {
         );
     }
     static add() {
-        Module.addToCircuit(new NBitMultiplexer("N-bit Multiplexer"));
+        Module.addToCircuit(new NBitMultiplexer({ name: "N-bit Multiplexer" }));
     }
 }
 
 class NBitAdder extends Module {
-    constructor(name) {
-        super(name, 4, 4);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 4;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Addend 1", 0, 1),
             new InputNode(this, "Addend 2", 0, 2),
@@ -421,8 +473,9 @@ class NBitAdder extends Module {
         this.outputs.forEach((node) => (node.pinDirection = 2));
         this.displayName = "Add";
     }
-    render(graphics) {
-        super.render(graphics, );
+    render(obj) {
+        obj.labels = [[this.displayName, 10, 0, 0]];
+        super.render(obj);
     }
     evaluate(time) {
         super.evaluate(time);
@@ -457,8 +510,8 @@ class NBitAdder extends Module {
         );
     }
     static add() {
-        Module.addToCircuit(new NBitAdder("N-bit Adder"));
+        Module.addToCircuit(new NBitAdder({ name: "N-bit Adder" }));
     }
 }
 
-export { NBitInput, BitwiseNotGate, NBitTriStateBuffer, BitwiseAndGate, BitwiseOrGate, NBitMultiplexer, NBitAdder }
+export { NBitInput, BitwiseNotGate, NBitTriStateBuffer, BitwiseAndGate, BitwiseOrGate, NBitMultiplexer, NBitAdder, openSplitterMenu }

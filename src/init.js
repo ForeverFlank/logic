@@ -136,31 +136,7 @@ function preload() {
     fontRegular = loadFont("Inter-Regular.ttf");
 }
 
-function pushAlert(level, message) {
-    let container = document.getElementById("alert-container");
-    let element;
-    if (level == "error") {
-        element = document.getElementById("alert-error");
-    } else if (level == "info") {
-        element = document.getElementById("alert-info");
-    } else {
-        return false;
-    }
-    let clone = element.cloneNode(true);
-    clone.innerText = message;
-    clone.style.display = "block";
-    container.appendChild(clone);
 
-    setTimeout(() => {
-        clone.animate([{ opacity: 1 }, { opacity: 0 }], {
-            duration: 1000,
-        });
-    }, 3000);
-
-    setTimeout(() => {
-        clone.remove();
-    }, 4000);
-}
 
 let bg = document.getElementById("background-blur");
 let modalMenu = document.getElementById("modal-menu");

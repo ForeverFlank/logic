@@ -1,4 +1,5 @@
 import { loadQuestions } from "./questions-manager.js";
+import { Quiz } from "./quizzes-manager.js";
 
 async function getQuizzes(src) {
     let quizzes = [];
@@ -18,6 +19,7 @@ async function openQuiz(obj) {
     let quizDiv = document.getElementById("learn-quiz-container");
     menuDiv.style.display = "none";
     quizDiv.style.display = "flex";
+    Quiz.activeQuiz = obj;
     loadQuestions(obj);
 }
 

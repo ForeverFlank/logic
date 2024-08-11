@@ -12,8 +12,12 @@
 </head>
 
 <body">
-  <p class="fixed left-3 bottom-2 text-sm text-zinc-600">v2.01 alpha <a class="mx-2 underline"
-      href="https://github.com/ForeverFlank/circuit-webapp" target="_blank">Source Code</a></p>
+  <p class="fixed left-3 bottom-2 text-sm text-zinc-600">v2.05 alpha
+    <a class="ml-2 underline"
+      href="https://github.com/ForeverFlank/logic" target="_blank">Source Code</a>
+    <a class="ml-2 underline"
+      href="https://foreverflank.github.io/circuit-webapp" target="_blank">Legacy Version</a>
+    </p>
   <div id="top-tab" class="flex sticky top-0 h-14 z-20 bg-zinc-100 border-b border-zinc-200">
     <div>
       <button class="h-full left-3 mx-3 my-0 px-4 py-0 top-button" onclick="openAccordionMenu('menu-circuits', 'grid')">
@@ -155,7 +159,7 @@
     <div id="selecting-nbitinput" class="flex flex-col gap-y-2" style="display: none">
       <p class="text-sm text-zinc-600">Value</p>
       <input id="selecting-nbitinput-value" class="border p-2 h-8 w-full rounded-sm focus-outline text-sm text-zinc-600"
-        type="text" value="0" oninput="setNBitInput()" />
+        type="text" value="0" />
     </div>
 
     <!--div id="selecting-remove" class="flex flex-col gap-y-2" style="display: none">
@@ -185,7 +189,7 @@
     </div-->
   </div>
 
-  <div id="learn-container" class="absolute p-12 top-14 left-0 overflow-scroll w-full h-full bg-zinc-100"
+  <div id="learn-container" class="z-10 absolute p-12 top-14 left-0 overflow-scroll w-full h-full bg-zinc-100"
     style="display: none;">
 
     <div class="max-w-[36rem] mx-auto">
@@ -204,8 +208,8 @@
       <div id="learn-quiz-container" class="flex flex-col gap-y-3" style="display: none;">
         <div class="hidden bg-zinc-300"></div>
         <div class="hidden bg-yellow-400"></div>
-        <div class="hidden bg-green-500"></div>
-        <div class="hidden bg-red-500"></div>
+        <div class="hidden text-green-500 bg-green-500"></div>
+        <div class="hidden text-red-500 bg-red-500"></div>
 
         <div id="learn-question-indicator"
           class="align-middle grid grid-cols-[repeat(20,_minmax(0,_1fr))] gap-1 bg-white p-2 rounded-lg border border-zinc-200">

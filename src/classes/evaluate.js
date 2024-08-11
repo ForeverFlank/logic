@@ -214,4 +214,9 @@ export function evaluateAll(reset = true, initTime = 0) {
                 }
             });
         });
+    this.getNodes().forEach(node => {
+        node.connections.forEach(wire => {
+            wire.render({ rerender: true });
+        });
+    });
 };

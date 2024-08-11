@@ -274,8 +274,10 @@ class XnorGate extends Module {
 }
 
 class TriStateBuffer extends Module {
-    constructor(name) {
-        super(name, 4, 2);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 2;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Input", 0, 1),
             new InputNode(this, "Control", 2, 0),
@@ -332,8 +334,10 @@ class TriStateBuffer extends Module {
 }
 
 class HalfAdder extends Module {
-    constructor(name) {
-        super(name, 4, 3);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 3;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Input 1", 0, 1),
             new InputNode(this, "Input 2", 0, 2),
@@ -345,6 +349,13 @@ class HalfAdder extends Module {
         this.inputs.forEach((node) => (node.pinDirection = 0));
         this.outputs.forEach((node) => (node.pinDirection = 2));
         this.displayName = "Half\nAdder";
+    }
+    render(obj = {
+        container: undefined,
+        graphics: undefined
+    }) {
+        obj.labels = [[this.displayName, 12, -5, 0]];
+        super.render(obj);
     }
     evaluate(time) {
         super.evaluate(time);
@@ -389,6 +400,13 @@ class FullAdder extends Module {
         this.inputs.forEach((node) => (node.pinDirection = 0));
         this.outputs.forEach((node) => (node.pinDirection = 2));
         this.displayName = "Full\nAdder";
+    }
+    render(obj = {
+        container: undefined,
+        graphics: undefined
+    }) {
+        obj.labels = [[this.displayName, 12, -5, 0]];
+        super.render(obj);
     }
     evaluate(time) {
         super.evaluate(time);

@@ -1,24 +1,38 @@
 {
-    "title": "Test 1",
-    "description": "Logic circuit test",
+    "id": "quiz-1",
+    "title": "Quiz 1",
+    "description": "Logic circuit quiz 1",
     "questions": [
         {
-            "question": "What is 1+1?",
+            "question": "Predict the output value",
+            "src": "img-1.png",
             "answers": [
-                "2",
-                "3",
-                "5"
+                "0",
+                "1"
             ],
             "correctAnswer": 0
         },
         {
-            "question": "What is 9^9?",
+            "question": "Predict the output value of A and B",
+            "src": "img-2.png",
             "answers": [
-                "A",
-                "B",
-                "C"
+                "0, 0",
+                "0, 1",
+                "1, 0",
+                "1, 1"
             ],
             "correctAnswer": 2
+        },
+        {
+            "question": "Find the appropriate value of A and B",
+            "src": "img-3.png",
+            "answers": [
+                "0, 0",
+                "0, 1",
+                "1, 0",
+                "1, 1"
+            ],
+            "correctAnswer": 1
         }
     ]
 }

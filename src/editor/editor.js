@@ -182,7 +182,7 @@ function editorPointerMove(e) {
             nodes[j].hovering(e);
             let wires = nodes[j].connections;
             for (let k = wires.length - 1; k >= 0; k--) {
-                // wires[k].released(e)
+                wires[k].hovering(e);
             }
         }
     }

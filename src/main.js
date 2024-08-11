@@ -14,7 +14,7 @@ createGateMenuButtons();
 
 var currentCircuit = new Circuit({ name: "Circuit" });
 export { currentCircuit }
-for (let i = 0; i < 1; ++i) NotGate.add();
+
 // let notGate = new NotGate({ name: "not1" })
 // notGate.x = 20;
 // notGate.y = 20;

@@ -50,7 +50,7 @@ class Module {
         this.objectType = "module";
         this.ignoreDiv = false;
         this.isHiddenOnAdd = false;
-        console.log(this)
+        // console.log(this)
     }
     hovering(e) {
         if (Editor.mode == "pan") return false;
@@ -212,7 +212,7 @@ class Module {
                 let item = obj.labels[i];
                 let style = new PIXI.TextStyle({
                     fontSize: item[1],
-                    fontFamily: "Inter"
+                    fontFamily: "Inter",
                 });
                 let text = new PIXI.Text({
                     text: item[0],
@@ -563,6 +563,7 @@ class Output extends Module {
         obj.labels = [[char, 12, 0, 0]];
         obj.src = "basic/output";
         super.render(obj);
+        this.labelTexts[0].text = char;
     }
     static add() {
         Module.addToCircuit(new Output({ name: "Output" }));
