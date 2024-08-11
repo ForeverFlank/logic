@@ -341,7 +341,7 @@ class Register extends Module {
         ];
         this.inputs.forEach((node) => (node.pinDirection = 0));
         this.outputs.forEach((node) => (node.pinDirection = 2));
-        this.displayName = "T";
+        this.displayName = "Register";
         this.latchValue = State.low;
         this.previousClk = State.low;
     }

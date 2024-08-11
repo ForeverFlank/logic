@@ -140,7 +140,7 @@ function editorPointerDown(e) {
     // console.log(e)
     // console.log(Editor.mode)
     updateEditorPointerPosition(e);
-    console.log('down', EventHandler.pointerPosition.x, EventHandler.pointerPosition.y)
+    // console.log('down', EventHandler.pointerPosition.x, EventHandler.pointerPosition.y)
     if (Editor.mode == "edit") {
         if (Editor.isPointerHoveringOnDiv(e)) return;
         let isPressedOnCircuit = Editor.circuitPointerDown(e);

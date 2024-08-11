@@ -76,8 +76,8 @@ class Module {
             Editor.pointerPosition.y > this.y &&
             Editor.pointerPosition.y < this.y + this.height * 20 &&
             !isHoveringNode;
-        console.log('x', this.x, Editor.pointerPosition.x, this.x + this.width * 20);
-        console.log('y', this.y, Editor.pointerPosition.y, this.y + this.height * 20);
+        // console.log('x', this.x, Editor.pointerPosition.x, this.x + this.width * 20);
+        // console.log('y', this.y, Editor.pointerPosition.y, this.y + this.height * 20);
         this.isHovering = hovering;
         // console.log(hovering)
         return hovering;
