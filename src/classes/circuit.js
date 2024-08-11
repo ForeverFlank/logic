@@ -64,8 +64,8 @@ class Circuit extends Module {
     evaluate() {
         // this.evaluateAll(false);
     }
-    evaluateAll() {
-        evaluateAll.call(this);
+    evaluateAll(reset, initTime) {
+        evaluateAll.call(this, reset, initTime);
     }
     serialize() {
         let moduleData = super.serialize();
