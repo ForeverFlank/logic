@@ -1,6 +1,12 @@
+import { Module, WireNode } from "../classes/module.js";
+import { ModuleNode, InputNode, OutputNode, SplitterNode } from "../classes/modulenode.js";
+import { State } from "../classes/state.js";
+
 class SRLatch extends Module {
-    constructor(name) {
-        super(name, 4, 4);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 4;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Set", 0, 1),
             new InputNode(this, "Reset", 0, 3),
@@ -14,13 +20,14 @@ class SRLatch extends Module {
         this.displayName = "S";
         this.latchValue = State.low;
     }
-    render(graphics) {
-        super.render(graphics, [
-            ["S", 12, -25, -20, LEFT],
-            ["R", 12, -25, 20, LEFT],
-            ["Q", 12, 25, -20, RIGHT],
-            ["Q'", 12, 25, 20, RIGHT],
-        ]);
+    render(obj) {
+        obj.labels = [
+            ["S", 12, -25, -20, 2],
+            ["R", 12, -25, 20, 2],
+            ["Q", 12, 25, -20, 0],
+            ["Q'", 12, 25, 20, 0],
+        ];
+        super.render(obj);
     }
     init() {
         super.init();
@@ -52,13 +59,15 @@ class SRLatch extends Module {
         );
     }
     static add() {
-        Module.addToCircuit(new SRLatch("SR Latch"));
+        Module.addToCircuit(new SRLatch({ name: "SR Latch" }));
     }
 }
 
 class DLatch extends Module {
-    constructor(name) {
-        super(name, 4, 4);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 4;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Data", 0, 1),
             new InputNode(this, "Enable", 0, 3),
@@ -72,13 +81,14 @@ class DLatch extends Module {
         this.displayName = "";
         this.latchValue = State.low;
     }
-    render(graphics) {
-        super.render(graphics, [
-            ["D", 12, -25, -20, LEFT],
-            ["EN", 12, -25, 20, LEFT],
-            ["Q", 12, 25, -20, RIGHT],
-            ["Q'", 12, 25, 20, RIGHT],
-        ]);
+    render(obj) {
+        obj.labels = [
+            ["D", 12, -25, -20, 2],
+            ["EN", 12, -25, 20, 2],
+            ["Q", 12, 25, -20, 0],
+            ["Q'", 12, 25, 20, 0],
+        ]
+        super.render(obj);
     }
     init() {
         super.init();
@@ -111,13 +121,15 @@ class DLatch extends Module {
         );
     }
     static add() {
-        Module.addToCircuit(new DLatch("D Latch"));
+        Module.addToCircuit(new DLatch({ name: "D Latch" }));
     }
 }
 
 class DFlipFlop extends Module {
-    constructor(name) {
-        super(name, 4, 4);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 4;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Data", 0, 1),
             new InputNode(this, "Clock", 0, 2),
@@ -132,13 +144,14 @@ class DFlipFlop extends Module {
         this.latchValue = State.low;
         this.previousClk = State.low;
     }
-    render(graphics) {
-        super.render(graphics, [
-            ["D", 12, -25, -20, LEFT],
+    render(obj) {
+        obj.labels = [
+            ["D", 12, -25, -20, 2],
             [">", 24, -24, 0],
-            ["Q", 12, 25, -20, RIGHT],
-            ["Q'", 12, 25, 20, RIGHT],
-        ]);
+            ["Q", 12, 25, -20, 0],
+            ["Q'", 12, 25, 20, 0],
+        ];
+        super.render(obj);
     }
     init() {
         super.init();
@@ -174,13 +187,15 @@ class DFlipFlop extends Module {
         );
     }
     static add() {
-        Module.addToCircuit(new DFlipFlop("D Flip Flop"));
+        Module.addToCircuit(new DFlipFlop({ name: "D Flip Flop" }));
     }
 }
 
 class TFlipFlop extends Module {
-    constructor(name) {
-        super(name, 4, 4);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 4;
+        super(obj);
         this.inputs = [
             new InputNode(this, "T", 0, 1),
             new InputNode(this, "Clock", 0, 2),
@@ -195,13 +210,14 @@ class TFlipFlop extends Module {
         this.latchValue = State.low;
         this.previousClk = State.low;
     }
-    render(graphics) {
-        super.render(graphics, [
-            ["T", 12, -25, -20, LEFT],
+    render(obj) {
+        obj.labels = [
+            ["T", 12, -25, -20, 2],
             [">", 24, -24, 0],
-            ["Q", 12, 25, -20, RIGHT],
-            ["Q'", 12, 25, 20, RIGHT],
-        ]);
+            ["Q", 12, 25, -20, 0],
+            ["Q'", 12, 25, 20, 0],
+        ];
+        super.render(obj);
     }
     init() {
         super.init();
@@ -237,13 +253,15 @@ class TFlipFlop extends Module {
         );
     }
     static add() {
-        Module.addToCircuit(new TFlipFlop("T Flip Flop"));
+        Module.addToCircuit(new TFlipFlop({ name: "T Flip Flop" }));
     }
 }
 
 class JKFlipFlop extends Module {
-    constructor(name) {
-        super(name, 4, 4);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 4;
+        super(obj);
         this.inputs = [
             new InputNode(this, "J", 0, 1),
             new InputNode(this, "K", 0, 3),
@@ -259,14 +277,15 @@ class JKFlipFlop extends Module {
         this.latchValue = State.low;
         this.previousClk = State.low;
     }
-    render(graphics) {
-        super.render(graphics, [
-            ["J", 12, -25, -20, LEFT],
-            ["K", 12, -25, 20, LEFT],
+    render(obj) {
+        obj.labels = [
+            ["J", 12, -25, -20, 2],
+            ["K", 12, -25, 20, 2],
             [">", 24, -24, 0],
-            ["Q", 12, 25, -20, RIGHT],
-            ["Q'", 12, 25, 20, RIGHT],
-        ]);
+            ["Q", 12, 25, -20, 0],
+            ["Q'", 12, 25, 20, 0],
+        ];
+        super.render(obj);
     }
     init() {
         super.init();
@@ -304,13 +323,15 @@ class JKFlipFlop extends Module {
         );
     }
     static add() {
-        Module.addToCircuit(new JKFlipFlop("JK Flip Flop"));
+        Module.addToCircuit(new JKFlipFlop({ name: "JK Flip Flop" }));
     }
 }
 
 class Register extends Module {
-    constructor(name) {
-        super(name, 4, 4);
+    constructor(obj) {
+        if (obj.width == null) obj.width = 4;
+        if (obj.height == null) obj.height = 4;
+        super(obj);
         this.inputs = [
             new InputNode(this, "Data", 0, 1),
             new InputNode(this, "Clock", 0, 2),
@@ -324,12 +345,13 @@ class Register extends Module {
         this.latchValue = State.low;
         this.previousClk = State.low;
     }
-    render(graphics) {
-        super.render(graphics, [
-            ["D", 12, -25, -20, LEFT],
+    render(obj) {
+        obj.labels = [
+            ["D", 12, -25, -20, 2],
             [">", 24, -24, 0],
-            ["Q", 12, 25, -20, RIGHT]
-        ]);
+            ["Q", 12, 25, -20, 0]
+        ];
+        super.render(obj);
     }
     init() {
         super.init();
@@ -359,7 +381,7 @@ class Register extends Module {
         );
     }
     static add() {
-        Module.addToCircuit(new Register("Register"));
+        Module.addToCircuit(new Register({ name: "Register" }));
     }
 }
 

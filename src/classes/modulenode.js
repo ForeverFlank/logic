@@ -309,8 +309,8 @@ class ModuleNode {
     disconnect(node, evaluate = true) {
         let [incomingWire, outgoingWire] = this.getWire(node);
         
-        mainContainer.removeChild(incomingWire.graphics);
-        mainContainer.removeChild(outgoingWire.graphics);
+        mainContainer.removeChild(incomingWire.container);
+        mainContainer.removeChild(outgoingWire.container);
         node.connections = node.connections.filter((x) => x != incomingWire);
         this.connections = this.connections.filter((x) => x != outgoingWire);
 
@@ -378,10 +378,12 @@ class ModuleNode {
             this.owner.container.addChild(this.graphics);
             // mainContainer.addChild(this.graphics);
         }
-        const netX = this.getCanvasX();
-        const netY = this.getCanvasY();
-        this.graphics.x = netX;
-        this.graphics.y = netY;
+        // const netX = this.getCanvasX();
+        // const netY = this.getCanvasY();
+        // this.graphics.x = netX;
+        // this.graphics.y = netY;
+        this.graphics.x = this.relativeX * Constants.GRID_SIZE;
+        this.graphics.y = this.relativeY * Constants.GRID_SIZE;
         if (this.isDragging) {
             this.graphics.scale.x = 1.2;
             this.graphics.scale.y = 1.2;

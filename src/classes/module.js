@@ -5,6 +5,7 @@ import { ModuleNode, InputNode, OutputNode } from "./modulenode.js";
 import { EventHandler } from "../event/event-handler.js";
 import { currentCircuit, mainContainer } from "../main.js";
 import * as Constants from "../constants.js";
+import { updateSelectedCircuitObjectUI } from "../ui/selected-object.js";
 
 // Drag to move by Daniel Shiffman <http://www.shiffman.net>
 // https://editor.p5js.org/icm/sketches/BkRHbimhm
@@ -32,8 +33,8 @@ class Module {
         this.id = unique(obj.name);
         this.width = obj.width;
         this.height = obj.height;
-        this.x = obj.x;
-        this.y = obj.y;
+        this.x = Math.round(obj.x / 20) * 20;
+        this.y = Math.round(obj.y / 20) * 20;
         this.displayName = "";
         this.inputs = [];
         this.outputs = [];
@@ -170,15 +171,35 @@ class Module {
             imageHeight: this.height * 20
         }
     ) {
-        if (this.sprite == null) {
+        if (this.container == null) {
             this.container = new PIXI.Container();
+            this.container.x = this.x;
+            this.container.y = this.y;
             mainContainer.addChild(this.container);
 
-            this.sprite = PIXI.Sprite.from('sprites/' + obj.src + '.png');
-            this.sprite.x = this.x;
-            this.sprite.y = this.y;
-            this.sprite.scale.x = Constants.TEXTURE_RESCALE;
-            this.sprite.scale.y = Constants.TEXTURE_RESCALE;
+            if (obj.src) {
+                this.sprite = PIXI.Sprite.from('sprites/' + obj.src + '.png');
+                // this.sprite.x = this.x;
+                // this.sprite.y = this.y;
+                this.sprite.scale.x = Constants.TEXTURE_RESCALE;
+                this.sprite.scale.y = Constants.TEXTURE_RESCALE;
+            } else {
+                this.sprite = new PIXI.Graphics();
+                /*
+                this.sprite.rect(
+                    this.x + Constants.GRID_SIZE / 2,
+                    this.y + Constants.GRID_SIZE / 2,
+                    (this.width - 1) * Constants.GRID_SIZE,
+                    (this.height - 1) * Constants.GRID_SIZE);
+                    */
+                this.sprite.rect(
+                    Constants.GRID_SIZE / 2,
+                    Constants.GRID_SIZE / 2,
+                    (this.width - 1) * Constants.GRID_SIZE,
+                    (this.height - 1) * Constants.GRID_SIZE);
+                this.sprite.fill(0xffffff);
+                this.sprite.stroke({ width: 2, color: 0x000000 });
+            }
             this.container.addChild(this.sprite)
 
             // console.log(this.x, this.y)
@@ -186,12 +207,29 @@ class Module {
             this.sprite.filters = [colorMatrix];
 
             this.labelTexts = [];
+            if (obj.labels == undefined) obj.labels = [];
             for (let i = 0, len = obj.labels.length; i < len; ++i) {
                 let item = obj.labels[i];
-                let text = new PIXI.Text({ text: item[0]})
+                let style = new PIXI.TextStyle({
+                    fontSize: item[1],
+                    fontFamily: "Inter"
+                });
+                let text = new PIXI.Text({
+                    text: item[0],
+                    resolution: 4,
+                    style
+                });
+                text.offsetX = item[2];
+                text.offsetY = item[3];
+                text.anchor.set(0.5, 0.5);
+                this.container.addChild(text);
                 this.labelTexts.push(text);
-                
             }
+        }
+        for (let i = 0, len = this.labelTexts.length; i < len; ++i) {
+            const text = this.labelTexts[i];
+            text.x = this.width * 10 + text.offsetX;
+            text.y = this.height * 10 + text.offsetY;
         }
         if (this.isDragging) {
             this.sprite.filters[0].brightness(0.6);
@@ -313,8 +351,8 @@ class Module {
             this.rawY = Editor.pointerPosition.y + this.offsetY;
             this.x = Math.round(this.rawX / 20) * 20;
             this.y = Math.round(this.rawY / 20) * 20;
-            this.sprite.x = this.x;
-            this.sprite.y = this.y;
+            this.container.x = this.x;
+            this.container.y = this.y;
             let inputs = this.inputs;
             let outputs = this.outputs;
             let container = this.container;
@@ -331,7 +369,7 @@ class Module {
                     });
                 }
             }
-    
+
             for (let j = inputs.length - 1; j >= 0; --j) {
                 let node = inputs[j];
                 renderWire(node);
@@ -424,15 +462,15 @@ class WireNode extends Module {
         }
         return false;
     }
-    render() {
-        super.render();
+    render(obj) {
+        super.render(obj);
+        // console.log('wirenode', this.x, this.y)
     }
     static add(x, y, value, evaluate) {
-        console.log('we')
         let mod = new WireNode({
-            name: "Node", 
-            x: x, 
-            y: y, 
+            name: "Node",
+            x: x,
+            y: y,
             value: value
         });
         currentCircuit.addModule(mod, evaluate);
@@ -464,6 +502,7 @@ class Input extends Module {
         obj.labels = [[char, 12, 0, 0]];
         obj.src = "basic/input";
         super.render(obj);
+        this.labelTexts[0].text = char;
     }
     selected() {
         super.selected();
@@ -500,11 +539,11 @@ function setInput(time, value) {
 }
 
 document.getElementById('selecting-input-z')
-        .addEventListener('click', () => setInput(0, -1));
+    .addEventListener('click', () => setInput(0, -1));
 document.getElementById('selecting-input-0')
-        .addEventListener('click', () => setInput(0,  0));
+    .addEventListener('click', () => setInput(0, 0));
 document.getElementById('selecting-input-1')
-        .addEventListener('click', () => setInput(0,  1));
+    .addEventListener('click', () => setInput(0, 1));
 
 class Output extends Module {
     constructor(obj) {

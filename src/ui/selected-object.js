@@ -5,7 +5,7 @@ function updateSelectedCircuitObjectUI() {
     for (let i = 0, len = div.children.length; i < len; ++i) {
         div.children[i].style.display = "none";
     }
-    // console.log(Editor.selectedCircuitObject)
+    // console.log('s', Editor.selectedCircuitObject)
     if (Editor.selectedCircuitObject) {
         let name = Editor.selectedCircuitObject.name;
         if (name != null) {

@@ -35,6 +35,10 @@ const mainContainer = new PIXI.Container({
 });
 export { mainContainer };
 
+PIXI.Assets.addBundle("fonts", [
+    { alias: "Inter", src: "Inter-Bold.ttf" }
+]);
+
 await app.init({
     width: mainCanvasContainer.getContainerWidth(),
     height: mainCanvasContainer.getContainerHeight(),

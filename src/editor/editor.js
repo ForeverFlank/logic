@@ -130,6 +130,7 @@ function editorPointerDown(e) {
         if (Editor.isPointerHoveringOnDiv(e)) return;
         let isPressedOnCircuit = Editor.circuitPointerDown(e);
         if (!isPressedOnCircuit) {
+            Editor.selectedCircuitObject = { id: 0 };
             Editor.panEnabled = true;
         }
     } else if (Editor.mode == "pan") {
@@ -142,6 +143,7 @@ function editorPointerDown(e) {
         if (Editor.pressedWire.id != 0) {
             Editor.pressedWire.remove();
         }
+        Editor.selectedCircuitObject = { id: 0 };
     }
     updateSelectedCircuitObjectUI();
 }

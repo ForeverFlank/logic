@@ -133,16 +133,6 @@ class NandGate extends Module {
         obj.src = "basic/nand";
         super.render(obj);
     }
-    render(graphics) {
-        super.render(graphics,
-            [[this.displayName, 12, -5, 0]],
-            "basic/nand",
-            0,
-            0,
-            80,
-            80
-        );
-    }
     evaluate(time) {
         super.evaluate(time);
         let result = State.and([

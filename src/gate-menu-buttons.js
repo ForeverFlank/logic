@@ -4,8 +4,8 @@ let buttons = {
     "gate-io": [
         ["Input", () => Gates.Input.add()],
         ["Output", () => Gates.Output.add()],
-        // ["N-bit Input", () => Gates.NBit.NBitInput.add()],
-        ["LED", () => Gates.IO.LED.add()],
+        ["N-bit Input", () => Gates.NBit.NBitInput.add()],
+        // ["LED", () => Gates.IO.LED.add()],
     ],
     "gate-basic": [
         ["NOT", () => Gates.Basic.NotGate.add()],
@@ -18,17 +18,17 @@ let buttons = {
         ["XNOR", () => Gates.Basic.XnorGate.add()],
     ],
     "gate-plexers": [
-        ["1-to-2 Decoder", () => Gates.Decoder1To2.add()],
-        ["2-to-4 Decoder", () => Gates.Decoder2To4.add()],
-        ["3-to-8 Decoder", () => Gates.Decoder3To8.add()],
+        ["1-to-2 Decoder", () => Gates.Plexers.Decoder1To2.add()],
+        ["2-to-4 Decoder", () => Gates.Plexers.Decoder2To4.add()],
+        ["3-to-8 Decoder", () => Gates.Plexers.Decoder3To8.add()],
     ],
     "gate-latches": [
-        ["SR Latch", () => Gates.SRLatch.add()],
-        ["D Latch", () => Gates.DLatch.add()],
-        ["D Flip Flop", () => Gates.DFlipFlop.add()],
-        ["T Flip Flop", () => Gates.TFlipFlop.add()],
-        ["JK Flip Flop", () => Gates.JKFlipFlop.add()],
-        ["Register", () => Gates.Register.add()],
+        ["SR Latch", () => Gates.Latches.SRLatch.add()],
+        ["D Latch", () => Gates.Latches.DLatch.add()],
+        ["D Flip Flop", () => Gates.Latches.DFlipFlop.add()],
+        ["T Flip Flop", () => Gates.Latches.TFlipFlop.add()],
+        ["JK Flip Flop", () => Gates.Latches.JKFlipFlop.add()],
+        ["Register", () => Gates.Latches.Register.add()],
     ],
     "gate-arithmetic": [
         ["Half Adder", () => Gates.HalfAdder.add()],

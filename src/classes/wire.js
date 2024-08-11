@@ -69,38 +69,72 @@ class Wire {
             return false;
         return true;
     }
+    renderWire() {
+        const sourceX = this.source.getCanvasX();
+        const sourceY = this.source.getCanvasY();
+        const destinationX = this.destination.getCanvasX();
+        const destinationY = this.destination.getCanvasY();
+        // console.log(sourceX, sourceY, destinationX, destinationY)
+        this.graphics.moveTo(sourceX, sourceY);
+        this.graphics.lineTo(destinationX, destinationY);
+        this.graphics.stroke({
+            color: 0xffffff,
+            width: 4
+        });
+
+        const wireLength = Math.sqrt(
+            (sourceX - destinationX) ** 2 + (sourceY - destinationY) ** 2
+        )
+        const dotsCount = Math.floor(wireLength / Constants.GRID_SIZE);
+        let isNBit =
+            this.source.getValueAtTime(Infinity).length > 1 ||
+            this.destination.getValueAtTime(Infinity).length > 1;
+
+        if (this.dots) {
+            for (let i = 0, len = this.dots.length; i < len; ++i) {
+                this.container.removeChild(this.dots[i]);
+            }
+        }
+        this.dots = [];
+        for (let i = 0; i < dotsCount; ++i) {
+            const dot = new PIXI.Container();
+            if (isNBit) {
+                let style = new PIXI.TextStyle({
+                    fontSize: 10,
+                    fontFamily: "Inter"
+                });
+                let text = new PIXI.Text({
+                    resolution: 4,
+                    style
+                });
+                text.offsetX = item[2];
+                text.offsetY = item[3];
+                text.anchor.set(0.5, 0.5);
+                dot.addChild(text);
+            } else {
+                const circle = new PIXI.Graphics();
+                circle.circle(0, 0, 2);
+                circle.fill(0xffff00);
+                dot.addChild(circle);
+            }
+            this.dots.push(dot);
+            this.container.addChild(dot);
+        }
+    }
     render(obj = {}) {
         if (!this.rendered) return;
         if (this.isSubModuleWire && !DEBUG_2) return;
-        if (this.graphics == null) {
+        if (this.container == null) {
+            this.container = new PIXI.Container();
             this.graphics = new PIXI.Graphics()
             this.graphics.eventMode = "static";
-            const sourceX = this.source.getCanvasX();
-            const sourceY = this.source.getCanvasY();
-            const destinationX = this.destination.getCanvasX();
-            const destinationY = this.destination.getCanvasY();
-            // console.log(sourceX, sourceY, destinationX, destinationY)
-            this.graphics.moveTo(sourceX, sourceY);
-            this.graphics.lineTo(destinationX, destinationY);
-            this.graphics.stroke({
-                color: 0xffffff,
-                width: 4
-            });
-            mainContainer.addChild(this.graphics);
+            this.container.addChild(this.graphics);
+            this.renderWire();
+            mainContainer.addChild(this.container);
         }
         if (obj.rerender) {
             this.graphics.clear();
-            const sourceX = this.source.getCanvasX();
-            const sourceY = this.source.getCanvasY();
-            const destinationX = this.destination.getCanvasX();
-            const destinationY = this.destination.getCanvasY();
-            // console.log(sourceX, sourceY, destinationX, destinationY)
-            this.graphics.moveTo(sourceX, sourceY);
-            this.graphics.lineTo(destinationX, destinationY);
-            this.graphics.stroke({
-                color: 0xffffff,
-                width: 4
-            });
+            this.renderWire();
         }
 
         let color;
@@ -118,6 +152,48 @@ class Wire {
             }
         }
         this.graphics.tint = color;
+
+        const sourceX = this.source.getCanvasX();
+        const sourceY = this.source.getCanvasY();
+        const destinationX = this.destination.getCanvasX();
+        const destinationY = this.destination.getCanvasY();
+        const wireLength = Math.sqrt(
+            (sourceX - destinationX) ** 2 + (sourceY - destinationY) ** 2
+        );
+        const dotsCount = this.dots.length;
+        const speed = 100;
+        let value = this.source.getValueAtTime(Infinity);
+
+        for (let i = 0; i < dotsCount; ++i) {
+            let t =
+                ((speed * Date.now()) / (wireLength * 1000) + i / dotsCount) % 1;
+            let deltaX = destinationX - sourceX;
+            let deltaY = destinationY - sourceY;
+            if (value.length == 1) {
+                // circle(sourceX + deltaX * t, sourceY + deltaY * t, 4);
+                this.dots[i].x = sourceX + deltaX * t;
+                this.dots[i].y = sourceY + deltaY * t;
+                // console.log(this.dots[i].x, this.dots[i].y)
+            } else {
+                // push();
+                let str = State.toString(value);
+                let bbox = fontRegular.textBounds(
+                    str,
+                    sourceX + deltaX * t,
+                    sourceY + deltaY * t - 16
+                );
+                fill("#f4f4f5");
+                rect(
+                    bbox.x - 2,
+                    bbox.y + 12,
+                    bbox.w + 2 * 2,
+                    bbox.h + 2 * 2
+                );
+                fill(0);
+                text(str, sourceX + deltaX * t, sourceY + deltaY * t - 1);
+                // pop();
+            }
+        }
 
         /*
         let sourceX = this.source.getCanvasX();
